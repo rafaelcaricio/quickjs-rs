@@ -69,9 +69,19 @@ fn main() {
     #[cfg(feature = "patched")]
     apply_patches(&code_dir);
 
+    eprintln!("Building Makefile...");
+    std::process::Command::new("wasimake")
+        .arg("cmake")
+        .arg(".")
+        .current_dir(&code_dir)
+        .spawn()
+        .expect("Could not use `wasimake` to build the Makefile")
+        .wait()
+        .expect("Could not use `wasimake` to build the Makefile");
+
     eprintln!("Compiling quickjs...");
     std::process::Command::new("make")
-        .arg(format!("lib{}.a", LIB_NAME))
+        .arg(LIB_NAME)
         .current_dir(&code_dir)
         .spawn()
         .expect("Could not compile quickjs")

@@ -124,7 +124,7 @@ static inline size_t js_trace_malloc_usable_size(void *ptr)
     return malloc_size(ptr);
 #elif defined(_WIN32)
     return _msize(ptr);
-#elif defined(EMSCRIPTEN)
+#elif defined(EMSCRIPTEN) || defined(__wasi__)
     return 0;
 #elif defined(__linux__)
     return malloc_usable_size(ptr);
@@ -240,7 +240,7 @@ static const JSMallocFunctions trace_mf = {
     malloc_size,
 #elif defined(_WIN32)
     (size_t (*)(const void *))_msize,
-#elif defined(EMSCRIPTEN)
+#elif defined(EMSCRIPTEN) || defined(__wasi__)
     NULL,
 #elif defined(__linux__)
     (size_t (*)(const void *))malloc_usable_size,
@@ -438,7 +438,7 @@ int main(int argc, char **argv)
                 goto fail;
         }
         if (interactive) {
-            js_std_eval_binary(ctx, qjsc_repl, qjsc_repl_size, 0);
+            eval_buf(ctx, qjsc_repl, qjsc_repl_size, "<input>", JS_EVAL_TYPE_MODULE);
         }
         js_std_loop(ctx);
     }
