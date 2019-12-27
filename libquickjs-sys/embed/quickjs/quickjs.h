@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__wasm__) || defined(__clang__)
 #define js_likely(x)          __builtin_expect(!!(x), 1)
 #define js_unlikely(x)        __builtin_expect(!!(x), 0)
 #define js_force_inline       inline __attribute__((always_inline))

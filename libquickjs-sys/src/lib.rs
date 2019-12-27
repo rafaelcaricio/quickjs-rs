@@ -13,17 +13,7 @@ include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 mod tests {
     use std::ffi::CStr;
 
-    use super::{JS_NewRuntime, JS_NewContext, JS_EVAL_TYPE_GLOBAL, JSContext, JSValue};
-
-    extern "C" {
-        pub fn JS_Eval(
-            ctx: *mut JSContext,
-            input: *const ::std::os::raw::c_char,
-            input_len: usize,
-            filename: *const ::std::os::raw::c_char,
-            eval_flags: ::std::os::raw::c_int,
-        ) -> i64;
-    }
+    use super::*;
 
     // Small sanity test that starts the runtime and evaluates code.
     #[test]
@@ -32,7 +22,7 @@ mod tests {
             let rt = JS_NewRuntime();
             let ctx = JS_NewContext(rt);
 
-            let code_str = "function sum(x, y) {return (x + y) * 2;};sum(4,1)\0";
+            let code_str = "1 + 1\0";
             let code = CStr::from_bytes_with_nul(code_str.as_bytes()).unwrap();
             let script = CStr::from_bytes_with_nul("script\0".as_bytes()).unwrap();
 
@@ -43,7 +33,8 @@ mod tests {
                 script.as_ptr(),
                 JS_EVAL_TYPE_GLOBAL as i32,
             );
-            println!("Result: {:?}", value);
+            assert_eq!(value.tag, 0);
+            assert_eq!(value.u.int32, 2);
         }
     }
 }
